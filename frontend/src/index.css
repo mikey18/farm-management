@@ -1,0 +1,18 @@
+/* You can include any basic reset or additional styles here */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --toastify-color-success: #1e8e3e;
+    --toastify-color-error: #ef4444;
+    --toastify-color-warning: #f59e0b;
+    --toastify-color-info: #3b82f6;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+#root {
+    height: 100%;
+}
