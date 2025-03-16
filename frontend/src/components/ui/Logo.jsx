@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { IoLeaf } from 'react-icons/io5';
+import { IoBasket } from 'react-icons/io5';
 
 const LogoContainer = styled.div`
     display: flex;
@@ -25,7 +25,7 @@ const Logo = ({ small = false }) => {
     return (
         <LogoContainer small={small}>
             <LogoIcon>
-                <IoLeaf />
+                <IoBasket />
             </LogoIcon>
             {!small && <LogoText>FarmFlow</LogoText>}
         </LogoContainer>
