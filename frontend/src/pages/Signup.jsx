@@ -37,7 +37,7 @@ const Signup = () => {
         } else {
             axios
                 .post(
-                    'http://localhost:8001/create_user',
+                    'http://localhost:8000/create_user',
                     {
                         firstname: firstname,
                         lastname: lastname,
@@ -72,7 +72,7 @@ const Signup = () => {
             <LAND>
                 <FORM onSubmit={onclick}>
                  
-                    <p className="header">Sign up</p>
+                    <p className="header">Sign up to YieldWise</p>
 
                     <p className="description">
                         Welcome back, Please enter your details.

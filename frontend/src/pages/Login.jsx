@@ -90,7 +90,7 @@ const Login = () => {
         } else {
             axios
                 .post(
-                    'http://localhost:8001/login_user',
+                    'http://localhost:8000/login_user',
 
                     {
                         email: email,
@@ -129,7 +129,7 @@ const Login = () => {
                             className="logo"
                         />
                     </div> */}
-                    <p className="header">Log in</p>
+                    <p className="header">Welcome, Log in to YieldWise</p>
 
                     <p className="description">
                         Welcome back, Please enter your details.

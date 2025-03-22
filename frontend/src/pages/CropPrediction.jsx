@@ -278,7 +278,7 @@ const CropPrediction = () => {
         setIsLoading(true);
         try {
             const response = await axios.post(
-                'http://localhost:8001/predict/',
+                'http://localhost:8000/predict/',
                 formData
             );
 
