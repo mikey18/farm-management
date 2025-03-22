@@ -77,7 +77,6 @@ model.fit(X_train, y_train)
 
 # Evaluate the model
 y_pred = model.predict(X_test)
-print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
 
 def predict_crops(input_data):
     # Predict the probabilities for each crop
