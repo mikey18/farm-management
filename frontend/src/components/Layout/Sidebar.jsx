@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
     IoGridOutline,
     IoTrailSignOutline,
@@ -11,7 +11,6 @@ import {
     IoBarChartOutline,
     IoChevronForwardOutline,
     IoChevronBackOutline,
-    IoSettingsOutline,
 } from 'react-icons/io5';
 import Logo from '../ui/Logo';
 import {
@@ -26,6 +25,7 @@ import {
 } from './Sidebar.styles';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+    const navigate = useNavigate()
     const [activeItem, setActiveItem] = useState('dashboard');
 
     const navItems = [
@@ -61,7 +61,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <SidebarContainer isOpen={isOpen}>
             <SidebarHeader>
                 <LogoWrapper isOpen={isOpen}>
-                    <Logo small={isOpen ? 'true' : 'false'} />
+                    <Logo isOpen={isOpen} small={isOpen ? 'true' : 'false'} />
                 </LogoWrapper>
                 <ToggleButton onClick={toggleSidebar}>
                     {isOpen ? (
@@ -89,9 +89,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavItem as="button" isOpen={isOpen}>
-                    <IoSettingsOutline />
-                    {isOpen && <NavText>Settings</NavText>}
+                <NavItem
+                    as="button"
+                    isOpen={isOpen}
+                    onClick={() => {
+                        localStorage.removeItem('auth');
+                        navigate('/')
+                        window.location.reload();
+                    }}
+                >
+                    {isOpen && <NavText>Log out</NavText>}
                 </NavItem>
             </SidebarFooter>
         </SidebarContainer>

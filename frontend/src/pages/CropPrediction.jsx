@@ -278,7 +278,7 @@ const CropPrediction = () => {
         setIsLoading(true);
         try {
             const response = await axios.post(
-                'http://localhost:8000/predict/',
+                'http://localhost:8001/predict/',
                 formData
             );
 
@@ -418,7 +418,6 @@ const CropPrediction = () => {
                                     <option value="sandy">Sandy</option>
                                     <option value="loamy">Loamy</option>
                                     <option value="clayey">Clayey</option>
-                                    <option value="silty">Silty</option>
                                 </FormSelect>
                             </FormGroup>
 

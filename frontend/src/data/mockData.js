@@ -48,9 +48,9 @@ export const mockUpcomingTasks = [
 ];
 
 export const mockFinancialData = {
-    income: '$8,250',
-    expenses: '$3,800',
-    profit: '$4,450',
+    income: '₦8,250',
+    expenses: '₦3,800',
+    profit: '₦4,450',
 };
 
 // Inventory Management Mock Data
@@ -240,13 +240,13 @@ export const mockCropData = [
 
 // Financial Management Mock Data
 export const mockFinancialSummary = {
-    income: '$25,450',
+    income: '₦25,450',
     incomeTrend: 12.5,
-    expenses: '$13,200',
+    expenses: '₦13,200',
     expensesTrend: -5.3,
-    profit: '$12,250',
+    profit: '₦12,250',
     profitTrend: 18.7,
-    balance: '$45,600',
+    balance: '₦45,600',
 };
 
 export const mockFinancialTransactions = [
@@ -255,42 +255,42 @@ export const mockFinancialTransactions = [
         category: 'Crop Sales',
         description: 'Sold 2 tons of yam',
         type: 'income',
-        amount: '$1,200',
+        amount: '₦1,200',
     },
     {
         date: '03/06/2023',
         category: 'Livestock Sales',
         description: 'Sold 50 chickens',
         type: 'income',
-        amount: '$500',
+        amount: '₦500',
     },
     {
         date: '01/06/2023',
         category: 'Feed Purchase',
         description: 'Purchased feed for livestock',
         type: 'expense',
-        amount: '$350',
+        amount: '₦350',
     },
     {
         date: '28/05/2023',
         category: 'Fertilizer',
         description: 'Purchased fertilizer for crops',
         type: 'expense',
-        amount: '$420',
+        amount: '₦420',
     },
     {
         date: '25/05/2023',
         category: 'Equipment Repair',
         description: 'Tractor maintenance',
         type: 'expense',
-        amount: '$250',
+        amount: '₦250',
     },
     {
         date: '20/05/2023',
         category: 'Crop Sales',
         description: 'Sold 1.5 tons of cassava',
         type: 'income',
-        amount: '$850',
+        amount: '₦850',
     },
 ];
 

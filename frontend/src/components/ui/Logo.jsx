@@ -21,11 +21,12 @@ const LogoText = styled.div`
     color: ${(props) => props.theme.colors.heading};
 `;
 
-const Logo = ({ small = false }) => {
+const Logo = ({ isOpen, small = false }) => {
     return (
         <LogoContainer small={small}>
             <LogoIcon>
                 <IoBasket />
+                {isOpen === true && <p>YieldWise</p>}
             </LogoIcon>
             {!small && <LogoText>FarmFlow</LogoText>}
         </LogoContainer>

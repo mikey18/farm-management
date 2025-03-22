@@ -13,12 +13,14 @@ import {
     NotificationButton,
     ProfileDropdown,
     ProfileButton,
-    DropdownContent,
-    DropdownItem,
+    // DropdownContent,
+    // DropdownItem,
 } from './Header.styles';
 
 const Header = ({ toggleSidebar }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const data = JSON.parse(localStorage.getItem('auth'))
+    const name = `${data.firstname} ${data.lastname}`
 
     return (
         <HeaderContainer>
@@ -36,17 +38,17 @@ const Header = ({ toggleSidebar }) => {
                         onClick={() => setDropdownOpen(!dropdownOpen)}
                     >
                         <IoPersonCircleOutline />
-                        <span>John Farmer</span>
+                        <span>{name}</span>
                     </ProfileButton>
 
-                    {dropdownOpen && (
+                    {/* {dropdownOpen && (
                         <DropdownContent>
                             <DropdownItem>Profile</DropdownItem>
                             <DropdownItem>Settings</DropdownItem>
                             <DropdownItem>Help</DropdownItem>
                             <DropdownItem isLogout>Logout</DropdownItem>
                         </DropdownContent>
-                    )}
+                    )} */}
                 </ProfileDropdown>
             </HeaderActions>
         </HeaderContainer>

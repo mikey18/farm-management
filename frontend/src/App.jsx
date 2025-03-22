@@ -7,19 +7,52 @@ import CropManagement from './pages/CropManagement';
 import FinancialManagement from './pages/FinancialManagement';
 import CropPrediction from './pages/CropPrediction';
 import NotFound from './pages/NotFound';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import { useEffect, useState } from 'react';
 
 function App() {
+    const [auth, setAuth] = useState(null);
+    useEffect(() => {
+        if (localStorage.getItem('auth')) {
+            setAuth(true);
+        } else {
+            setAuth(false);
+        }
+    }, []);
     return (
         <Routes>
-            <Route path="/" element={<Layout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="inventory" element={<InventoryManagement />} />
-                <Route path="livestock" element={<LivestockManagement />} />
-                <Route path="crops" element={<CropManagement />} />
-                <Route path="finances" element={<FinancialManagement />} />
-                <Route path="prediction" element={<CropPrediction />} />
+            {auth === true && (
+                <>
+                    <Route path="/" element={<Layout />}>
+                        <Route index element={<Dashboard />} />
+                        <Route
+                            path="inventory"
+                            element={<InventoryManagement />}
+                        />
+                        <Route
+                            path="livestock"
+                            element={<LivestockManagement />}
+                        />
+                        <Route path="crops" element={<CropManagement />} />
+                        <Route
+                            path="finances"
+                            element={<FinancialManagement />}
+                        />
+
+                        <Route path="prediction" element={<CropPrediction />} />
+                    </Route>
+                </>
+            )}
+            {auth === false && (
+                <>
+                    <Route index element={<Login />} />
+                    <Route path="signup" element={<Signup />} />
+                </>
+            )}
+            {auth === true && auth === false && (
                 <Route path="*" element={<NotFound />} />
-            </Route>
+            )}
         </Routes>
     );
 }

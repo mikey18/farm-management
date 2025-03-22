@@ -199,7 +199,7 @@ const Dashboard = () => {
         crops: { value: 7, trend: 5.2 },
         livestock: { value: 124, trend: -2.1 },
         machinery: { value: 23, trend: 0 },
-        finances: { value: '$12,450', trend: 12.3 },
+        finances: { value: '₦12,450', trend: 12.3 },
     });
 
     return (
