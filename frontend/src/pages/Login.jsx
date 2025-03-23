@@ -2,82 +2,132 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
+import { FiLoader } from 'react-icons/fi';
 
 export const LAND = styled.div`
     display: flex;
     width: 100%;
     justify-content: center;
-    gap: 50px;
-    position: absolute;
-    top: 70px;
-    bottom: 70px;
     align-items: center;
+    min-height: 100vh;
+    background: #f4f7fe;
 `;
 
 export const FORM = styled.form`
-    display: grid;
-    gap: 30px;
-    width: 500px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    width: 400px;
 
-    .loggo {
-        display: flex;
-        justify-content: center;
-    }
     .header {
         text-align: center;
-        color: #344054;
+        color: #333;
         font-weight: bold;
-        font-size: 35px;
+        font-size: 30px;
+        margin-bottom: 10px;
     }
+
     .description {
         text-align: center;
-        color: #344054;
+        color: #555;
+        font-size: 14px;
+        margin-bottom: 20px;
     }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
     .label {
-        display: block;
-        font-size: 15px;
-        color: #344054;
+        font-size: 14px;
+        color: #555;
+        font-weight: 500;
     }
+
     .form-input {
         width: 100%;
-        padding: 15px;
-        border-radius: 5px;
+        padding: 12px;
+        border-radius: 8px;
         border: 1px solid #d0d5dd;
-        color: #344054;
-        font-size: 15px;
+        font-size: 14px;
+        transition: all 0.3s ease-in-out;
     }
+
     .form-input:focus {
-        outline: none !important;
+        outline: none;
+        border-color: green;
+        box-shadow: 0px 0px 6px rgba(74, 144, 226, 0.2);
     }
+
+    .error {
+        color: #d9534f;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
     .click {
-        background-color: green;
+        background: green;
         color: white;
         font-weight: bold;
         width: 100%;
         height: 44px;
-        gap: 8px;
         border-radius: 8px;
         cursor: pointer;
         border: none;
         display: flex;
         justify-content: center;
         align-items: center;
+        font-size: 16px;
+        transition: 0.3s ease-in-out;
     }
+
+    .click:hover {
+        background: green;
+    }
+
+    .loading-icon {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
     .dont {
         text-align: center;
+        font-size: 14px;
+        margin-top: 15px;
     }
+
     .go {
         color: green;
         text-decoration: none;
         font-weight: bold;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .go:hover {
+        color: #3b7ed0;
     }
 `;
+
 const Login = () => {
     const [load, setLoad] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    // const nav = useNavigate()
 
     const login = (e) => {
         e.preventDefault();
@@ -91,16 +141,8 @@ const Login = () => {
             axios
                 .post(
                     'http://localhost:8000/login_user',
-
-                    {
-                        email: email,
-                        password: password,
-                    },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    }
+                    { email, password },
+                    { headers: { 'Content-Type': 'application/json' } }
                 )
                 .then((res) => {
                     if (res.data.status === 400) {
@@ -114,70 +156,62 @@ const Login = () => {
                         );
                         window.location.reload();
                     }
+                })
+                .catch(() => {
+                    setError('An error occurred. Please try again.');
+                    setLoad(false);
                 });
         }
     };
 
     return (
-        <>
-            <LAND>
-                <FORM onSubmit={login}>
-                    {/* <div className="loggo">
-                        <img
-                            src={logo}
-                            alt="log"
-                            className="logo"
-                        />
-                    </div> */}
-                    <p className="header">Log in</p>
+        <LAND>
+            <FORM onSubmit={login}>
+                <p className="header">Log in</p>
+                <p className="description">
+                    Welcome back, please enter your details.
+                </p>
 
-                    <p className="description">
-                        Welcome back, Please enter your details.
-                    </p>
+                <div className="input-group">
+                    <label className="label">Email</label>
+                    <input
+                        type="email"
+                        className="form-input"
+                        placeholder="Enter your email"
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
 
-                    <div>
-                        <label className="label">Email</label>
-                        <input
-                            type="email"
-                            className="form-input"
-                            placeholder="Enter your email"
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
+                <div className="input-group">
+                    <label className="label">Password</label>
+                    <input
+                        type="password"
+                        className="form-input"
+                        placeholder="Enter your password"
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
 
-                    <div>
-                        <label className="label">Password</label>
-                        <input
-                            type="password"
-                            className="form-input"
-                            placeholder="Enter your password"
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
+                {error && <p className="error">{error}</p>}
 
-                    {error && <p style={{ color: 'red' }}>{error}</p>}
-
+                <button className="click" type="submit" disabled={load}>
                     {load ? (
-                        <div className="click">Loading...</div>
+                        <FiLoader className="loading-icon" size={20} />
                     ) : (
-                        <button className="click" type="submit">
-                            Sign in
-                        </button>
+                        'Sign in'
                     )}
+                </button>
 
-                    <p className="dont">
-                        Don&apos;t have an account?{' '}
-                        <span>
-                            <Link to="/signup" className="go">
-                                Sign up
-                            </Link>
-                        </span>
-                    </p>
-                </FORM>
-            </LAND>
-        </>
+                <p className="dont">
+                    Don&apos;t have an account?{' '}
+                    <Link to="/signup" className="go">
+                        Sign up
+                    </Link>
+                </p>
+            </FORM>
+        </LAND>
     );
 };
 
