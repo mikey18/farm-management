@@ -19,8 +19,8 @@ import {
 
 const Header = ({ toggleSidebar }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const data = JSON.parse(localStorage.getItem('auth'))
-    const name = `${data.firstname} ${data.lastname}`
+    const data = JSON.parse(localStorage.getItem('auth'));
+    const name = `${data.firstname} ${data.lastname}`;
 
     return (
         <HeaderContainer>

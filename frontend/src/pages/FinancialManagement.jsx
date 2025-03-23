@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
     IoAdd,
@@ -10,14 +11,20 @@ import {
     IoTrashOutline,
     IoWallet,
     IoWalletOutline,
+    IoClose,
+    IoCheckmark,
+    IoArrowUp,
+    IoArrowDown,
 } from 'react-icons/io5';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import StatCard from '../components/ui/StatCard';
 import {
-    mockFinancialTransactions,
-    mockFinancialSummary,
-} from '../data/mockData';
+    selectFilteredTransactions,
+    selectFinancialSummary,
+    addTransaction,
+    deleteTransaction,
+} from '../store/financialSlice';
 
 const PageContainer = styled.div`
     display: flex;
@@ -224,21 +231,292 @@ const ButtonGroup = styled.div`
     gap: ${(props) => props.theme.spacing[2]};
 `;
 
+// Modal styles
+const ModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+`;
+
+const ModalContent = styled.div`
+    background-color: white;
+    border-radius: ${(props) => props.theme.borderRadius.lg};
+    width: 100%;
+    max-width: 550px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+`;
+
+const ModalHeader = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: ${(props) => props.theme.spacing[4]};
+    border-bottom: 1px solid ${(props) => props.theme.colors.border};
+`;
+
+const ModalTitle = styled.h2`
+    margin: 0;
+    font-size: ${(props) => props.theme.fontSizes.xl};
+`;
+
+const ModalCloseButton = styled.button`
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${(props) => props.theme.colors.textLight};
+    padding: ${(props) => props.theme.spacing[1]};
+    border-radius: ${(props) => props.theme.borderRadius.full};
+
+    &:hover {
+        background-color: ${(props) => props.theme.colors.background};
+        color: ${(props) => props.theme.colors.text};
+    }
+`;
+
+const ModalBody = styled.div`
+    padding: ${(props) => props.theme.spacing[4]};
+`;
+
+const ModalFooter = styled.div`
+    padding: ${(props) => props.theme.spacing[4]};
+    border-top: 1px solid ${(props) => props.theme.colors.border};
+    display: flex;
+    justify-content: flex-end;
+    gap: ${(props) => props.theme.spacing[2]};
+`;
+
+const FormGroup = styled.div`
+    margin-bottom: ${(props) => props.theme.spacing[4]};
+`;
+
+const FormLabel = styled.label`
+    display: block;
+    margin-bottom: ${(props) => props.theme.spacing[1]};
+    font-size: ${(props) => props.theme.fontSizes.sm};
+    font-weight: 500;
+    color: ${(props) => props.theme.colors.text};
+`;
+
+const FormInput = styled.input`
+    width: 100%;
+    padding: ${(props) => props.theme.spacing[2]};
+    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: ${(props) => props.theme.borderRadius.md};
+    font-size: ${(props) => props.theme.fontSizes.sm};
+    outline: none;
+
+    &:focus {
+        border-color: ${(props) => props.theme.colors.primary};
+        box-shadow: 0 0 0 2px ${(props) => `${props.theme.colors.primary}30`};
+    }
+`;
+
+const FormSelect = styled.select`
+    width: 100%;
+    padding: ${(props) => props.theme.spacing[2]};
+    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: ${(props) => props.theme.borderRadius.md};
+    font-size: ${(props) => props.theme.fontSizes.sm};
+    outline: none;
+    background-color: white;
+
+    &:focus {
+        border-color: ${(props) => props.theme.colors.primary};
+        box-shadow: 0 0 0 2px ${(props) => `${props.theme.colors.primary}30`};
+    }
+`;
+
+const FormRow = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: ${(props) => props.theme.spacing[4]};
+
+    @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
+        grid-template-columns: 1fr;
+    }
+`;
+
+const TransactionTypeSelector = styled.div`
+    display: flex;
+    gap: ${(props) => props.theme.spacing[2]};
+    margin-bottom: ${(props) => props.theme.spacing[4]};
+`;
+
+const TypeButton = styled.button`
+    flex: 1;
+    padding: ${(props) => props.theme.spacing[3]};
+    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: ${(props) => props.theme.borderRadius.md};
+    background-color: ${(props) =>
+        props.isActive
+            ? props.type === 'income'
+                ? `${props.theme.colors.success}15`
+                : `${props.theme.colors.danger}15`
+            : 'white'};
+    color: ${(props) => props.theme.colors.text};
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: ${(props) => props.theme.spacing[2]};
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: ${(props) =>
+            props.type === 'income'
+                ? `${props.theme.colors.success}10`
+                : `${props.theme.colors.danger}10`};
+    }
+
+    .icon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: ${(props) =>
+            props.type === 'income'
+                ? `${props.theme.colors.success}15`
+                : `${props.theme.colors.danger}15`};
+    }
+
+    .icon {
+        color: ${(props) =>
+            props.type === 'income'
+                ? props.theme.colors.success
+                : props.theme.colors.danger};
+        font-size: 20px;
+    }
+
+    .label {
+        font-weight: 500;
+    }
+
+    border: ${(props) =>
+        props.isActive
+            ? props.type === 'income'
+                ? `2px solid ${props.theme.colors.success}`
+                : `2px solid ${props.theme.colors.danger}`
+            : `1px solid ${props.theme.colors.border}`};
+`;
+
 const FinancialManagement = () => {
+    const dispatch = useDispatch();
     const [activeFilter, setActiveFilter] = useState('all');
     const [activeDateFilter, setActiveDateFilter] = useState('month');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newTransaction, setNewTransaction] = useState({
+        type: 'income',
+        category: '',
+        amount: '',
+        date: new Date().toISOString().split('T')[0],
+        description: '',
+    });
 
-    const filteredTransactions = mockFinancialTransactions.filter(
-        (transaction) => {
-            if (activeFilter === 'income' && transaction.type !== 'income') {
-                return false;
-            }
-            if (activeFilter === 'expense' && transaction.type !== 'expense') {
-                return false;
-            }
-            return true;
-        }
+    // Get data from Redux store
+    const filteredTransactions = useSelector((state) =>
+        selectFilteredTransactions(state, activeFilter, activeDateFilter)
     );
+    const financialSummary = useSelector(selectFinancialSummary);
+
+    // Categories for the dropdown
+    const categories = {
+        income: [
+            'Sales',
+            'Investments',
+            'Grants',
+            'Subsidies',
+            'Loans',
+            'Other Income',
+        ],
+        expense: [
+            'Seeds & Plants',
+            'Fertilizers',
+            'Pesticides',
+            'Equipment',
+            'Labor',
+            'Utilities',
+            'Rent',
+            'Fuel',
+            'Maintenance',
+            'Insurance',
+            'Marketing',
+            'Other Expenses',
+        ],
+    };
+
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        // Reset form
+        setNewTransaction({
+            type: 'income',
+            category: '',
+            amount: '',
+            date: new Date().toISOString().split('T')[0],
+            description: '',
+        });
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewTransaction((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleTypeChange = (type) => {
+        setNewTransaction((prev) => ({
+            ...prev,
+            type,
+            category: '', // Reset category when type changes
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        // Ensure amount is a valid number
+        const amount = Number.parseFloat(newTransaction.amount) || 0;
+
+        // Format the transaction data
+        const formattedTransaction = {
+            ...newTransaction,
+            amount: amount.toFixed(2),
+            // Add a timestamp for sorting and a unique ID
+            timestamp: new Date().toISOString(),
+            id: Date.now().toString(),
+        };
+
+        // Dispatch action to add transaction to Redux store
+        dispatch(addTransaction(formattedTransaction));
+
+        // Close the modal after submission
+        handleCloseModal();
+    };
+
+    const handleDeleteTransaction = (id) => {
+        // Dispatch action to delete transaction from Redux store
+        dispatch(deleteTransaction(id));
+    };
 
     return (
         <PageContainer>
@@ -254,7 +532,7 @@ const FinancialManagement = () => {
                         <IoDownloadOutline />
                         Export
                     </Button>
-                    <Button>
+                    <Button onClick={handleOpenModal}>
                         <IoAdd />
                         Add Transaction
                     </Button>
@@ -264,31 +542,31 @@ const FinancialManagement = () => {
             <StatsGrid>
                 <StatCard
                     title="Total Income"
-                    value={mockFinancialSummary.income}
+                    value={financialSummary.income}
                     icon={IoWalletOutline}
-                    trend={mockFinancialSummary.incomeTrend}
+                    trend={financialSummary.incomeTrend}
                     trendLabel="from last month"
                     color="#1E8E3E"
                 />
                 <StatCard
                     title="Total Expenses"
-                    value={mockFinancialSummary.expenses}
+                    value={financialSummary.expenses}
                     icon={IoWalletOutline}
-                    trend={mockFinancialSummary.expensesTrend}
+                    trend={financialSummary.expensesTrend}
                     trendLabel="from last month"
                     color="#D92D20"
                 />
                 <StatCard
                     title="Net Profit"
-                    value={mockFinancialSummary.profit}
+                    value={financialSummary.profit}
                     icon={IoWalletOutline}
-                    trend={mockFinancialSummary.profitTrend}
+                    trend={financialSummary.profitTrend}
                     trendLabel="from last month"
                     color="#6941C6"
                 />
                 <StatCard
                     title="Balance"
-                    value={mockFinancialSummary.balance}
+                    value={financialSummary.balance}
                     icon={IoWalletOutline}
                     color="#3B82F6"
                 />
@@ -355,8 +633,8 @@ const FinancialManagement = () => {
                             </tr>
                         </TableHead>
                         <TableBody>
-                            {filteredTransactions.map((transaction, index) => (
-                                <TableRow key={index}>
+                            {filteredTransactions.map((transaction) => (
+                                <TableRow key={transaction.id}>
                                     <TableCell>
                                         <div
                                             style={{
@@ -402,7 +680,14 @@ const FinancialManagement = () => {
                                         {transaction.amount}
                                     </AmountCell>
                                     <TableCell>
-                                        <ActionButton title="Delete">
+                                        <ActionButton
+                                            title="Delete"
+                                            onClick={() =>
+                                                handleDeleteTransaction(
+                                                    transaction.id
+                                                )
+                                            }
+                                        >
                                             <IoTrashOutline />
                                         </ActionButton>
                                     </TableCell>
@@ -422,6 +707,141 @@ const FinancialManagement = () => {
                     </Table>
                 </TableContainer>
             </Card>
+
+            {/* Add Transaction Modal */}
+            {isModalOpen && (
+                <ModalOverlay>
+                    <ModalContent>
+                        <ModalHeader>
+                            <ModalTitle>Add New Transaction</ModalTitle>
+                            <ModalCloseButton onClick={handleCloseModal}>
+                                <IoClose size={24} />
+                            </ModalCloseButton>
+                        </ModalHeader>
+                        <form onSubmit={handleSubmit}>
+                            <ModalBody>
+                                <TransactionTypeSelector>
+                                    <TypeButton
+                                        type="income"
+                                        isActive={
+                                            newTransaction.type === 'income'
+                                        }
+                                        onClick={() =>
+                                            handleTypeChange('income')
+                                        }
+                                    >
+                                        <div className="icon-container">
+                                            <IoArrowUp className="icon" />
+                                        </div>
+                                        <span className="label">Income</span>
+                                    </TypeButton>
+                                    <TypeButton
+                                        type="expense"
+                                        isActive={
+                                            newTransaction.type === 'expense'
+                                        }
+                                        onClick={() =>
+                                            handleTypeChange('expense')
+                                        }
+                                    >
+                                        <div className="icon-container">
+                                            <IoArrowDown className="icon" />
+                                        </div>
+                                        <span className="label">Expense</span>
+                                    </TypeButton>
+                                </TransactionTypeSelector>
+
+                                <FormRow>
+                                    <FormGroup>
+                                        <FormLabel htmlFor="amount">
+                                            Amount
+                                        </FormLabel>
+                                        <FormInput
+                                            type="number"
+                                            id="amount"
+                                            name="amount"
+                                            value={newTransaction.amount}
+                                            onChange={handleInputChange}
+                                            placeholder="0.00"
+                                            min="0"
+                                            step="0.01"
+                                            required
+                                        />
+                                    </FormGroup>
+
+                                    <FormGroup>
+                                        <FormLabel htmlFor="date">
+                                            Date
+                                        </FormLabel>
+                                        <FormInput
+                                            type="date"
+                                            id="date"
+                                            name="date"
+                                            value={newTransaction.date}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </FormGroup>
+                                </FormRow>
+
+                                <FormGroup>
+                                    <FormLabel htmlFor="category">
+                                        Category
+                                    </FormLabel>
+                                    <FormSelect
+                                        id="category"
+                                        name="category"
+                                        value={newTransaction.category}
+                                        onChange={handleInputChange}
+                                        required
+                                    >
+                                        <option value="">
+                                            Select a category
+                                        </option>
+                                        {categories[newTransaction.type].map(
+                                            (category) => (
+                                                <option
+                                                    key={category}
+                                                    value={category}
+                                                >
+                                                    {category}
+                                                </option>
+                                            )
+                                        )}
+                                    </FormSelect>
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <FormLabel htmlFor="description">
+                                        Description
+                                    </FormLabel>
+                                    <FormInput
+                                        type="text"
+                                        id="description"
+                                        name="description"
+                                        value={newTransaction.description}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter a description"
+                                    />
+                                </FormGroup>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    type="button"
+                                    onClick={handleCloseModal}
+                                    variant="outline"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button type="submit">
+                                    <IoCheckmark />
+                                    Add Transaction
+                                </Button>
+                            </ModalFooter>
+                        </form>
+                    </ModalContent>
+                </ModalOverlay>
+            )}
         </PageContainer>
     );
 };

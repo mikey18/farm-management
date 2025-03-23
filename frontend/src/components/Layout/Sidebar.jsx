@@ -25,7 +25,7 @@ import {
 } from './Sidebar.styles';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const [activeItem, setActiveItem] = useState('dashboard');
 
     const navItems = [
@@ -94,7 +94,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     isOpen={isOpen}
                     onClick={() => {
                         localStorage.removeItem('auth');
-                        navigate('/')
+                        navigate('/');
                         window.location.reload();
                     }}
                 >

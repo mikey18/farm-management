@@ -129,7 +129,7 @@ const Login = () => {
                             className="logo"
                         />
                     </div> */}
-                    <p className="header">Welcome, Log in to YieldWise</p>
+                    <p className="header">Log in</p>
 
                     <p className="description">
                         Welcome back, Please enter your details.

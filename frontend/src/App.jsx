@@ -10,6 +10,8 @@ import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { useEffect, useState } from 'react';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 function App() {
     const [auth, setAuth] = useState(null);
@@ -21,39 +23,44 @@ function App() {
         }
     }, []);
     return (
-        <Routes>
-            {auth === true && (
-                <>
-                    <Route path="/" element={<Layout />}>
-                        <Route index element={<Dashboard />} />
-                        <Route
-                            path="inventory"
-                            element={<InventoryManagement />}
-                        />
-                        <Route
-                            path="livestock"
-                            element={<LivestockManagement />}
-                        />
-                        <Route path="crops" element={<CropManagement />} />
-                        <Route
-                            path="finances"
-                            element={<FinancialManagement />}
-                        />
+        <Provider store={store}>
+            <Routes>
+                {auth === true && (
+                    <>
+                        <Route path="/" element={<Layout />}>
+                            <Route index element={<Dashboard />} />
+                            <Route
+                                path="inventory"
+                                element={<InventoryManagement />}
+                            />
+                            <Route
+                                path="livestock"
+                                element={<LivestockManagement />}
+                            />
+                            <Route path="crops" element={<CropManagement />} />
+                            <Route
+                                path="finances"
+                                element={<FinancialManagement />}
+                            />
 
-                        <Route path="prediction" element={<CropPrediction />} />
-                    </Route>
-                </>
-            )}
-            {auth === false && (
-                <>
-                    <Route index element={<Login />} />
-                    <Route path="signup" element={<Signup />} />
-                </>
-            )}
-            {auth === true && auth === false && (
-                <Route path="*" element={<NotFound />} />
-            )}
-        </Routes>
+                            <Route
+                                path="prediction"
+                                element={<CropPrediction />}
+                            />
+                        </Route>
+                    </>
+                )}
+                {auth === false && (
+                    <>
+                        <Route index element={<Login />} />
+                        <Route path="signup" element={<Signup />} />
+                    </>
+                )}
+                {auth === true && auth === false && (
+                    <Route path="*" element={<NotFound />} />
+                )}
+            </Routes>
+        </Provider>
     );
 }
 

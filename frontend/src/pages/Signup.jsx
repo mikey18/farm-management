@@ -5,7 +5,6 @@ import { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 
-
 export const NAME_DIV = styled.div`
     display: flex;
     justify-content: space-between;
@@ -18,7 +17,7 @@ const Signup = () => {
 
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     // const nav = useNavigate()
 
@@ -26,7 +25,7 @@ const Signup = () => {
         e.preventDefault();
         setLoad(true);
         setError(null);
-     
+
         if (
             firstname.trim().length === 0 ||
             lastname.trim().length === 0 ||
@@ -60,8 +59,8 @@ const Signup = () => {
                             'auth',
                             JSON.stringify(res.data.data)
                         );
-                        navigate("/")
-                        window.location.reload()
+                        navigate('/');
+                        window.location.reload();
                     }
                 });
         }
@@ -71,7 +70,6 @@ const Signup = () => {
         <>
             <LAND>
                 <FORM onSubmit={onclick}>
-                 
                     <p className="header">Sign up to YieldWise</p>
 
                     <p className="description">
@@ -99,8 +97,6 @@ const Signup = () => {
                             />
                         </div>
                     </NAME_DIV>
-
-                   
 
                     <div>
                         <label className="label">Email address</label>
