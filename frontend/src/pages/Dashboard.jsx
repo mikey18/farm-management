@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 import {
     IoLeafOutline,
     IoFishOutline,
@@ -11,14 +10,15 @@ import {
     IoCalendarOutline,
     IoArrowForward,
 } from 'react-icons/io5';
+import styled from 'styled-components';
 import StatCard from '../components/ui/StatCard';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import {
-    mockNotifications,
-    mockFinancialData,
-    mockUpcomingTasks,
-} from '../data/mockData';
+import { selectAllCrops } from '../store/cropSlice';
+import { selectLivestockStats } from '../store/livestockSlice';
+import { selectAllMachinery } from '../store/inventorySlice';
+import { selectFinancialSummary } from '../store/financialSlice';
+import { mockNotifications, mockUpcomingTasks } from '../data/mockData';
 
 const DashboardContainer = styled.div`
     display: flex;
@@ -195,12 +195,20 @@ const TaskDate = styled.div`
 `;
 
 const Dashboard = () => {
-    const [stats] = useState({
-        crops: { value: 7, trend: 5.2 },
-        livestock: { value: 124, trend: -2.1 },
-        machinery: { value: 23, trend: 0 },
-        finances: { value: '₦12,450', trend: 12.3 },
-    });
+    // Get data from Redux store
+    const crops = useSelector(selectAllCrops);
+    const livestockStats = useSelector(selectLivestockStats);
+    const machinery = useSelector(selectAllMachinery);
+    const financialSummary = useSelector(selectFinancialSummary);
+
+    // Format currency for display
+    const formatCurrency = (value) => {
+        if (!value) return '₦0.00';
+        return `₦${parseFloat(value).toLocaleString('en-NG', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })}`;
+    };
 
     return (
         <DashboardContainer>
@@ -211,31 +219,31 @@ const Dashboard = () => {
             <StatsGrid>
                 <StatCard
                     title="Crops"
-                    value={stats.crops.value}
+                    value={crops.length}
                     icon={IoLeafOutline}
-                    trend={stats.crops.trend}
+                    trend={0} // You could calculate this based on historical data
                     trendLabel="from last season"
                     color="#1E8E3E"
                 />
                 <StatCard
                     title="Livestock"
-                    value={stats.livestock.value}
+                    value={livestockStats.total}
                     icon={IoFishOutline}
-                    trend={stats.livestock.trend}
+                    trend={livestockStats.totalTrend}
                     trendLabel="from last month"
                     color="#E67700"
                 />
                 <StatCard
                     title="Machinery"
-                    value={stats.machinery.value}
+                    value={machinery.length}
                     icon={IoTrailSignOutline}
                     color="#3B82F6"
                 />
                 <StatCard
                     title="Monthly Revenue"
-                    value={stats.finances.value}
+                    value={formatCurrency(financialSummary.income)}
                     icon={IoWalletOutline}
-                    trend={stats.finances.trend}
+                    trend={financialSummary.incomeTrend}
                     trendLabel="from last month"
                     color="#6941C6"
                 />
@@ -315,7 +323,7 @@ const Dashboard = () => {
                             <span
                                 style={{ color: '#1E8E3E', fontWeight: '500' }}
                             >
-                                {mockFinancialData.income}
+                                {formatCurrency(financialSummary.income)}
                             </span>
                         </div>
                         <div
@@ -329,7 +337,7 @@ const Dashboard = () => {
                             <span
                                 style={{ color: '#D92D20', fontWeight: '500' }}
                             >
-                                {mockFinancialData.expenses}
+                                {formatCurrency(financialSummary.expenses)}
                             </span>
                         </div>
                         <div
@@ -343,7 +351,7 @@ const Dashboard = () => {
                             <span
                                 style={{ color: '#1E8E3E', fontWeight: '500' }}
                             >
-                                {mockFinancialData.profit}
+                                {formatCurrency(financialSummary.profit)}
                             </span>
                         </div>
                     </Card>
